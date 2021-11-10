@@ -1,0 +1,38 @@
+<form [formGroup]="reportFormGroup">
+<mat-card>
+  <mat-card-title>Create Monthly Excel Report</mat-card-title>
+  <mat-card-subtitle>Create Monthly Excel Report</mat-card-subtitle>
+    <mat-card-content style="display: flex; gap: 20px;flex-wrap: wrap;">
+      <section style="flex-grow: 1">
+        <mat-calendar #calendar
+                    (viewChanged)="viewChanged($event)"
+                    (monthSelected)="monthSelected($event)"
+                    (selectedChange)="select($event)"
+                    [dateClass]="isSelected"></mat-calendar>
+      </section>
+
+      <section style="flex-grow: 1">
+        <mat-form-field>
+          <mat-label>Skrócona Nazwa Użytkownika</mat-label>
+          <input formControlName="user"
+                  placeholder="np. dsowa"
+                 matInput>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Domyślna Nazwa Klienta</mat-label>
+          <input matInput
+                 formControlName="client">
+        </mat-form-field>
+      </section>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+
+      <button mat-button
+              color="primary"
+              (click)="createReport()">Create report</button>
+    </mat-card-actions>
+
+</mat-card>
+
+</form>

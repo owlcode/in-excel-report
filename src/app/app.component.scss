@@ -1,0 +1,34 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+$indigo: mat.$indigo-palette;
+
+.u-mw-300 {
+  max-width: 300px;
+}
+
+.mat-calendar-body-cell.selected {
+  background-color: map.get($indigo, 50) !important;
+  border-radius: 50%
+}
+
+.mat-calendar-body-cell {
+  &.selected {
+    background-color: map.get($indigo, 50) !important;
+    border-radius: 50%
+  }
+
+  &.first-selected {
+    background-color: map.get($indigo, 50) !important;
+    border-radius: 50% 0 0 50%;
+  }
+
+  &.last-selected {
+    background-color: map.get($indigo, 50) !important;
+    border-radius: 0 50% 50% 0;
+  }
+
+  &.middle-selected {
+    background-color: map.get($indigo, 50) !important;
+    border-radius: 0;
+  }
+}
