@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/owl-app'),
+      dir: require('path').join(__dirname, './coverage/in-excel-report'),
       subdir: '.',
       reporters: [
         { type: 'html' },
