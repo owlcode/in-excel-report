@@ -14,4 +14,5 @@ jobs:
       - uses: actions/checkout@v1
       - name: Trigger ng deploy
         run: |
-          ng deploy --baseHref=/in-excel-report/
+          npm ci
+          npm run deploy
