@@ -1,0 +1,16 @@
+push:
+    branches:
+      - master
+name: Deploy to GitHub Pages
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Trigger ng deploy
+        run: |
+          npm deploy --baseHref=/in-excel-report/
