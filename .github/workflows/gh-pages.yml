@@ -12,7 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Trigger ng deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Install dependencies
         run: |
           npm ci
+      - name: Trigger deployment command
+        run: |
           npm run deploy
