@@ -13,12 +13,7 @@ export class InExcelExportService {
     ["LOG_DATE_FROM", "LOG_DATE_TO", "LOG_CLIENT", "LOG_ISSUE_NAME", "LOG_PROJECT_HOURS", "LOG_INTERNAL_HOURS"],
   ];
     formGroup = new FormGroup({
-      client: new FormControl(ls.get('client') || '', [Validators.required]),
-      project: new FormControl(),
-      showProjectCalendar: new FormControl(false),
-      internalHours: new FormControl(false),
-      user: new FormControl(ls.get('user') || '', [Validators.required, Validators.minLength(2)]),
-      entries: new FormArray(ls.get('entries') || [], Validators.minLength(1))
+      user: new FormControl(ls.get('user') || ''),
     });
 
     updateLs$ = this.formGroup.valueChanges.pipe(tap((reportConfig: ReportConfig) => {
@@ -29,7 +24,6 @@ export class InExcelExportService {
     
     subscription = new Subscription();    
     
-
     constructor() {
       this.subscription.add(this.updateLs$.subscribe())
     }
@@ -38,13 +32,13 @@ export class InExcelExportService {
       this.subscription.unsubscribe();
     }
 
-    createReport(selectedDays: string[]): void {
+    createReport(selectedDays: string[], client?: string, project?: string, isInternal?: boolean): void {
       const activeDate = toDate(parseISO(selectedDays[0]) || Date.now());
       const fileName = `${this.formGroup.get('user')?.value}_${format(activeDate, 'yyyy_MM')}.xlsx`;    
-      this.saveXlsxFile(this.calculateReport(selectedDays), fileName);
+      this.saveXlsxFile(this.calculateReport(selectedDays, client, project, isInternal), fileName);
     }
 
-    calculateReport(selectedDays: string[]): string[][] {
+    calculateReport(selectedDays: string[], client?: string, project?: string, isInternal?: boolean): string[][] {
       if (!selectedDays || !selectedDays.length) {
         return [...this.reportColumns];
       }
@@ -62,13 +56,15 @@ export class InExcelExportService {
       const daysInWeek = groupBy(selectedDays.map((day) => parseISO(day)), getWeek)
       const sumProjectHours = selectedDays.length * 8;
       intervals.forEach((interval, index) => {
+        const weekHours = ((daysInWeek[getWeek(interval)]?.length || 0) * 8).toString();
+        
         ws_data.push([
           format(index === 0 ? firstDay : interval, this.dateFormat),
           format(index === intervals.length - 1 ? lastDay : addDays(interval, 6), this.dateFormat),
-          this.formGroup.get('client')?.value,
-          'Projekt',
-          ((daysInWeek[getWeek(interval)]?.length || 0) * 8).toString(),
-          (0).toString()
+          client || '',
+          project || 'Projekt',
+          isInternal ? '0' : weekHours,
+          isInternal ? weekHours : '0'
         ])
       })
       ws_data.push([]);

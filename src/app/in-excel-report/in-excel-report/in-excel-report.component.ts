@@ -30,8 +30,9 @@ export class InExcelReportComponent implements OnInit {
   }
 
   onExport(event: Event): void {
-    console.log(this.reportCards);
-    this.inExcelExportService.createReport(Array.from(Array.from(this.reportCards)[0].daysSelected.values()));
+    const firstCard = this.reportCards.get(0);
+    const { client, project, isInternal } = firstCard?.formGroup.value;
+    firstCard && this.inExcelExportService.createReport(Array.from(firstCard.daysSelected.values()), client, project, isInternal);
   }
 
   multiExport() {

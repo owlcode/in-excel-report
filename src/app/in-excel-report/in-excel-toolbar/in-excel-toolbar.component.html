@@ -10,7 +10,6 @@
         </mat-form-field>
     </form>
     <button
-        style="margin-left: 10px"
         class="u-ml-medium"
         [matMenuTriggerFor]="selectMonthMenu"
         mat-raised-button
@@ -19,7 +18,7 @@
         aria-label="Select reporting month"
     >
         <span style="text-transform: capitalize">{{ month }}</span>
-        <mat-icon>event</mat-icon>
+        <mat-icon class="u-ml-small">event</mat-icon>
     </button>
 
     <mat-menu #selectMonthMenu>
@@ -33,7 +32,7 @@
     </mat-menu>
     
     <button
-        style="margin-left: 10px"
+        class="u-ml-medium"
         mat-raised-button
         color="primary"
         matTooltip="Save report to xlsx file"
@@ -41,6 +40,6 @@
         aria-label="Export prepared report to excel"
     >
         Export to xlsx
-        <mat-icon>save</mat-icon>
+        <mat-icon class="u-ml-small">file_download</mat-icon>
     </button>
 </mat-toolbar>
