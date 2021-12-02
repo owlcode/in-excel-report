@@ -1,9 +1,33 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
+
 $indigo: mat.$indigo-palette;
 
 .u-mw-300 {
   max-width: 300px;
+}
+
+.u-ml-medium {
+  margin-left: 10px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.u-d-f {
+  display: flex;
+}
+
+// Remove miminum width of input fields
+.mat-form-field-infix {
+  width: auto !important;
+}
+
+mat-form-field.mod-hide-error {
+  // .mat-form-field-wrapper {
+  //   padding-bottom: 0;
+  // }
 }
 
 .mat-calendar-body-cell.selected {
