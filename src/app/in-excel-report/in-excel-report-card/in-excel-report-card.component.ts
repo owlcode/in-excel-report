@@ -17,8 +17,8 @@ export interface InExcelReportCardModel {
     client: string;
     project: string;
     isInternal: boolean;
-    FormGroup?: FormGroup;
-    selectedDays: string[];
+    hours: string;
+    selectedDays?: string[];
 }
 @Component({
     selector: 'in-excel-report-card',
@@ -27,13 +27,13 @@ export interface InExcelReportCardModel {
 })
 export class InExcelReportCardComponent implements OnChanges, AfterViewInit {
     readonly dateFormat = this.inExcelExportService.dateFormat;
-    readonly reportColumns = this.inExcelExportService.reportColumns;
     readonly emptyCalendarHeader = InEmptyCalendarHeader;
 
     formGroup = new FormGroup({
-        client: new FormControl(ls.get('client') || '', [Validators.required]),
-        project: new FormControl(ls.get('project') || '', [Validators.required]),
-        isInternal: new FormControl(false),
+        client: new FormControl(ls.get('client') || ''),
+        project: new FormControl(ls.get('project') || ''),
+        hours: new FormControl(ls.get('hours') || ''),
+        isInternal: new FormControl(ls.get('isInternal') || false),
     });
 
     updateLs$ = this.formGroup.valueChanges.pipe(

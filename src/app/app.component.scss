@@ -7,8 +7,14 @@ $indigo: mat.$indigo-palette;
   max-width: 300px;
 }
 
+button.u-ml-medium,
 .u-ml-medium {
   margin-left: 10px;
+}
+
+button.u-ml-small,
+.u-ml-small {
+  margin-left: 5px;
 }
 
 .spacer {
