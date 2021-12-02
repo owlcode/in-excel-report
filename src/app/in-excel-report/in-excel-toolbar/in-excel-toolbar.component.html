@@ -1,0 +1,46 @@
+<mat-toolbar>
+    <img src="https://in-team.com.pl/static/logo.svg" style="max-height: 100%" />
+    <span class="u-ml-medium">Monthly Excel Report</span>
+    
+    <span class="spacer"></span>
+    <form [formGroup]="formGroup">
+        <mat-form-field>
+            <mat-label>Reporter Name</mat-label>
+            <input formControlName="user" placeholder="jkowalski" matInput />
+        </mat-form-field>
+    </form>
+    <button
+        style="margin-left: 10px"
+        class="u-ml-medium"
+        [matMenuTriggerFor]="selectMonthMenu"
+        mat-raised-button
+        matTooltip="Select reporting month"
+        (click)="onSelectMonth($event)"
+        aria-label="Select reporting month"
+    >
+        <span style="text-transform: capitalize">{{ month }}</span>
+        <mat-icon>event</mat-icon>
+    </button>
+
+    <mat-menu #selectMonthMenu>
+        <mat-calendar
+            *ngIf="isMenuOpened | async"
+            startView="year"
+            (click)="$event.stopPropagation()"
+            [headerComponent]="emptyHeaderComponent"
+            (monthSelected)="monthSelected($event)"
+        ></mat-calendar>
+    </mat-menu>
+    
+    <button
+        style="margin-left: 10px"
+        mat-raised-button
+        color="primary"
+        matTooltip="Save report to xlsx file"
+        (click)="onExport($event)"
+        aria-label="Export prepared report to excel"
+    >
+        Export to xlsx
+        <mat-icon>save</mat-icon>
+    </button>
+</mat-toolbar>

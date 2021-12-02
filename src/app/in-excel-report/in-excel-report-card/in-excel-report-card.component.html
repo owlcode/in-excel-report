@@ -1,38 +1,41 @@
-<form [formGroup]="reportFormGroup">
-<mat-card>
-  <mat-card-title>Create Monthly Excel Report</mat-card-title>
-  <mat-card-subtitle>Create Monthly Excel Report</mat-card-subtitle>
-    <mat-card-content style="display: flex; gap: 20px;flex-wrap: wrap;">
-      <section style="flex-grow: 1">
-        <mat-calendar #calendar
-                    (viewChanged)="viewChanged($event)"
-                    (monthSelected)="monthSelected($event)"
-                    (selectedChange)="select($event)"
-                    [dateClass]="isSelected"></mat-calendar>
-      </section>
+<form [formGroup]="formGroup">
+    <mat-card>
+        <mat-card-subtitle>
+            <mat-checkbox formControlName="isInternal">Internal Hours</mat-checkbox>
 
-      <section style="flex-grow: 1">
-        <mat-form-field>
-          <mat-label>Skrócona Nazwa Użytkownika</mat-label>
-          <input formControlName="user"
-                  placeholder="np. dsowa"
-                 matInput>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Domyślna Nazwa Klienta</mat-label>
-          <input matInput
-                 formControlName="client">
-        </mat-form-field>
-      </section>
-    </mat-card-content>
+            <button
+                style="float: right"
+                matTooltip="Remove Report Entry"
+                (click)="remove.next()"
+                [matTooltipPosition]="'above'"
+                mat-icon-button
+                aria-label="Remove report entry"
+            >
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-card-subtitle>
 
-    <mat-card-actions align="end">
+        <mat-card-content>
+            <section class="form">
+                <mat-form-field>
+                    <mat-label>Client Name</mat-label>
+                    <input matInput formControlName="client" />
+                </mat-form-field>
+                <!-- <mat-slide-toggle [(ngModel)]="showProjectCalendar">{{showProjectCalendar}}</mat-slide-toggle> -->
+                <mat-form-field>
+                    <mat-label>Project Name</mat-label>
+                    <input matInput formControlName="project" />
+                </mat-form-field>
+            </section>
 
-      <button mat-button
-              color="primary"
-              (click)="createReport()">Create report</button>
-    </mat-card-actions>
-
-</mat-card>
-
+            <mat-divider></mat-divider>
+            <mat-calendar
+                #calendar
+                [headerComponent]="emptyCalendarHeader"
+                (selectedChange)="select($event)"
+                [dateClass]="isSelected"
+            ></mat-calendar>
+            <!-- <mat-divider [vertical]="true"></mat-divider> -->
+        </mat-card-content>
+    </mat-card>
 </form>
