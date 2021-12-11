@@ -1,4 +1,13 @@
-# 1.1.0 (2021-12-02)
+# [1.2.0](https://github.com/owlcode/in-excel-report/compare/v1.1.0...v1.2.0) (2021-12-11)
+
+
+### Features
+
+* Support multi card, add tests ([894cf99](https://github.com/owlcode/in-excel-report/commit/894cf998acdc89820d2108a476deb1671acea4ed))
+
+
+
+# [1.1.0](https://github.com/owlcode/in-excel-report/compare/7921eb6ce6c5bed93e62edfc6571cd196a056dff...v1.1.0) (2021-12-02)
 
 
 ### Bug Fixes
