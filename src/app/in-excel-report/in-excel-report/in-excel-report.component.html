@@ -1,12 +1,24 @@
-<in-excel-toolbar (add)="onAdd($event)" (export)="onExport($event)" (selectedMonthChange)="onMonthChange($event)"></in-excel-toolbar>
+<in-excel-toolbar
+  (add)="onAdd()"
+  (export)="onExport()"
+  (selectedMonthChange)="onMonthChange($event)"
+></in-excel-toolbar>
 <main class="container">
-    <in-excel-report-card *ngFor="let card of cards; index as i" [month]="this.month" (remove)="onRemove(i)"></in-excel-report-card>
+  <in-excel-report-card
+    *ngFor="let card of cards; index as i"
+    [month]="this.month"
+    (remove)="onRemove(i)"
+  ></in-excel-report-card>
 
-    <div class="add-card-placeholder" (click)="onAdd($event)" >
-        <h2>Add Report Entry</h2>
-        <button mat-fab matTooltip="Add new client to report" color="primary" aria-label="Add new client report">
-            <mat-icon>add</mat-icon>
-        </button>
-    </div>
-    
+  <div class="add-card-placeholder" (click)="onAdd()">
+    <h2>Add Report Entry</h2>
+    <button
+      mat-fab
+      matTooltip="Add new client to report"
+      color="primary"
+      aria-label="Add new client report"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
 </main>

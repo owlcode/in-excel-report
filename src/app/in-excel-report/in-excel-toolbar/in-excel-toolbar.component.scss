@@ -1,8 +1,16 @@
-
-
 :host {
   mat-form-field {
-    font-size: 14px;
+    &.mat-form-field {
+      font-size: 12px;
+    }
     transform: translateY(9px);
   }
+
+  .mat-form-field-flex {
+    padding-top: 0;
+  }
+}
+
+.mat-form-field-flex {
+  padding-top: 0;
 }

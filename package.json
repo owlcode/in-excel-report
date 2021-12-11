@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:prod": "ng test --browsers=ChromeHeadless --no-watch",
     "deploy": "ng deploy --baseHref=/in-excel-report/ --no-silent --name=\"IN\" --email=in@owlstd.io",
     "semantic-release": "semantic-release"
   },
@@ -53,5 +54,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/owlcode/in-excel-report.git"
+  },
+  "prettier": {
+    "tabWidth": 2
   }
 }
