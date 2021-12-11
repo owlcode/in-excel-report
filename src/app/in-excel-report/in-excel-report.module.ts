@@ -6,7 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import {
+  MatFormFieldModule,
+  MAT_FORM_FIELD_DEFAULT_OPTIONS,
+} from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
@@ -19,25 +22,39 @@ import { InExcelReportCardComponent } from './in-excel-report-card/in-excel-repo
 import { InExcelReportComponent } from './in-excel-report/in-excel-report.component';
 import { InExcelToolbarComponent } from './in-excel-toolbar/in-excel-toolbar.component';
 @NgModule({
-    declarations: [InExcelReportCardComponent, InExcelToolbarComponent, InExcelReportComponent],
-    exports: [InExcelReportComponent, InExcelToolbarComponent, InExcelReportCardComponent],
-    imports: [
-        CommonModule,
-        MatToolbarModule,
-        MatMenuModule,
-        MatCheckboxModule,
-        MatDatepickerModule,
-        MatSlideToggleModule,
-        ReactiveFormsModule,
-        MatDividerModule,
-        MatIconModule,
-        MatTooltipModule,
-        MatInputModule,
-        MatButtonModule,
-        MatCardModule,
-        MatDateFnsModule,
-        MatFormFieldModule,
-    ],
-    providers: [{provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'fill'}}, InExcelExportService],
+  declarations: [
+    InExcelReportCardComponent,
+    InExcelToolbarComponent,
+    InExcelReportComponent,
+  ],
+  exports: [
+    InExcelReportComponent,
+    InExcelToolbarComponent,
+    InExcelReportCardComponent,
+  ],
+  imports: [
+    CommonModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatSlideToggleModule,
+    ReactiveFormsModule,
+    MatDividerModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDateFnsModule,
+    MatFormFieldModule,
+  ],
+  providers: [
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'fill' },
+    },
+    InExcelExportService,
+  ],
 })
 export class InExcelReportModule {}

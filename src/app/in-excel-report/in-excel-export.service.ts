@@ -1,86 +1,226 @@
 import { Injectable } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { addDays, eachDayOfInterval, eachWeekOfInterval, endOfMonth, format, getWeek, isWeekend, lastDayOfMonth, parseISO, startOfMonth, toDate } from 'date-fns';
+import { FormControl, FormGroup } from '@angular/forms';
+import {
+  eachWeekOfInterval,
+  endOfWeek,
+  format,
+  isSameMonth,
+  isWithinInterval,
+  lastDayOfMonth,
+  parseISO,
+  startOfMonth,
+  toDate,
+} from 'date-fns';
 import ls from 'localstorage-slim';
-import { groupBy } from 'lodash';
 import { Subscription, tap } from 'rxjs';
 import * as xlsx from 'xlsx';
-import { ReportConfig } from './in-excel-export.model';
+import {
+  IReportEntry,
+  ReportConfig,
+  WorkingDay,
+} from './in-excel-export.model';
 @Injectable()
 export class InExcelExportService {
   readonly dateFormat = 'yyyy-MM-dd';
   readonly reportColumns = [
-    ["LOG_DATE_FROM", "LOG_DATE_TO", "LOG_CLIENT", "LOG_ISSUE_NAME", "LOG_PROJECT_HOURS", "LOG_INTERNAL_HOURS"],
+    [
+      'LOG_DATE_FROM',
+      'LOG_DATE_TO',
+      'LOG_CLIENT',
+      'LOG_ISSUE_NAME',
+      'LOG_PROJECT_HOURS',
+      'LOG_INTERNAL_HOURS',
+    ],
   ];
-    formGroup = new FormGroup({
-      user: new FormControl(ls.get('user') || ''),
-    });
+  formGroup = new FormGroup({
+    user: new FormControl(ls.get('user') || ''),
+  });
 
-    updateLs$ = this.formGroup.valueChanges.pipe(tap((reportConfig: ReportConfig) => {
+  updateLs$ = this.formGroup.valueChanges.pipe(
+    tap((reportConfig: ReportConfig) => {
       Object.entries(reportConfig).forEach(([key, value]) => {
         ls.set(key, value);
-      })
-    }))
-    
-    subscription = new Subscription();    
-    
-    constructor() {
-      this.subscription.add(this.updateLs$.subscribe())
-    }
-  
-    ngOnDestroy() {
-      this.subscription.unsubscribe();
-    }
+      });
+    })
+  );
 
-    createReport(selectedDays: string[], client?: string, project?: string, isInternal?: boolean): void {
-      const activeDate = toDate(parseISO(selectedDays[0]) || Date.now());
-      const fileName = `${this.formGroup.get('user')?.value}_${format(activeDate, 'yyyy_MM')}.xlsx`;    
-      this.saveXlsxFile(this.calculateReport(selectedDays, client, project, isInternal), fileName);
-    }
+  subscription = new Subscription();
 
-    calculateReport(selectedDays: string[], client?: string, project?: string, isInternal?: boolean): string[][] {
-      if (!selectedDays || !selectedDays.length) {
-        return [...this.reportColumns];
+  constructor() {
+    this.subscription.add(this.updateLs$.subscribe());
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  createReport(data: string[][]): void {
+    const activeDate = new Date();
+    const fileName = `${this.formGroup.get('user')?.value}_${format(
+      activeDate,
+      'yyyy_MM'
+    )}.xlsx`;
+    this.saveXlsxFile(data, fileName);
+  }
+
+  createMultiReport(entries: IReportEntry[]): string[][] {
+    function date(x: string): Date {
+      if (!x) return new Date();
+      return toDate(parseISO(x));
+    }
+    function getEntryKey(entry: IReportEntry): string {
+      return `${entry.client}..${entry.project}`;
+    }
+    let firstReportedDay!: string;
+    let lastReportedDay!: string;
+    let entriesGrouped: Record<
+      string,
+      {
+        $entry: IReportEntry;
+        projectDays: WorkingDay[];
+        internalDays: WorkingDay[];
+      }
+    > = {};
+    entries.forEach((entry) => {
+      const entryKey = getEntryKey(entry);
+      if (!entriesGrouped[entryKey]) {
+        entriesGrouped[entryKey] = {
+          $entry: entry,
+          projectDays: [],
+          internalDays: [],
+        };
       }
 
-      const ws_data = [...this.reportColumns];
-      const activeDate = toDate(parseISO(selectedDays[0]) || Date.now())
-      const firstDay = startOfMonth(activeDate);
-      const lastDay = lastDayOfMonth(activeDate);
-      const intervals = eachWeekOfInterval({
-        start: startOfMonth(activeDate),
-        end: endOfMonth(activeDate)
-      }, {
-        weekStartsOn: 1
+      entry.selectedDays.forEach((selectedDay) => {
+        entriesGrouped[entryKey][
+          entry.isInternal ? 'internalDays' : 'projectDays'
+        ].push({
+          date: selectedDay,
+          hours: entry.hours,
+        });
+
+        if (!firstReportedDay || !lastReportedDay) {
+          firstReportedDay = selectedDay;
+          lastReportedDay = selectedDay;
+          return;
+        }
+
+        if (date(selectedDay) > date(lastReportedDay)) {
+          lastReportedDay = selectedDay;
+        }
+
+        if (date(selectedDay) < date(firstReportedDay)) {
+          firstReportedDay = selectedDay;
+        }
       });
-      const daysInWeek = groupBy(selectedDays.map((day) => parseISO(day)), getWeek)
-      const sumProjectHours = selectedDays.length * 8;
-      intervals.forEach((interval, index) => {
-        const weekHours = ((daysInWeek[getWeek(interval)]?.length || 0) * 8).toString();
-        
-        ws_data.push([
-          format(index === 0 ? firstDay : interval, this.dateFormat),
-          format(index === intervals.length - 1 ? lastDay : addDays(interval, 6), this.dateFormat),
-          client || '',
-          project || 'Projekt',
-          isInternal ? '0' : weekHours,
-          isInternal ? weekHours : '0'
-        ])
-      })
-      ws_data.push([]);
-      ws_data.push([]);
-      ws_data.push(['', '', '', '', sumProjectHours.toString()]);
-      console.table(ws_data);
-      
-      return ws_data;
+    });
+    const firstDayFirstMonth = startOfMonth(date(firstReportedDay));
+    const lastDayLastMonth = lastDayOfMonth(date(lastReportedDay));
+    const intervals = eachWeekOfInterval(
+      {
+        start: firstDayFirstMonth,
+        end: lastDayLastMonth,
+      },
+      {
+        weekStartsOn: 1,
+      }
+    );
+    intervals[0] = firstDayFirstMonth;
+    const intervalsGrouped: Record<
+      string,
+      {
+        [key: string]: {
+          internalHours: number;
+          projectHours: number;
+        };
+      }
+    > = {};
+    intervals.forEach((interval) => {
+      function isWithinWeek(date: number | Date): boolean {
+        return isWithinInterval(date, {
+          start: interval,
+          end: endOfWeek(interval, { weekStartsOn: 1 }),
+        });
+      }
+
+      Object.keys(entriesGrouped).forEach((key) => {
+        let week = intervalsGrouped[format(interval, this.dateFormat)];
+        if (!week) {
+          intervalsGrouped[format(interval, this.dateFormat)] = {};
+          week = intervalsGrouped[format(interval, this.dateFormat)];
+        }
+        if (!week[key]) {
+          week[key] = {
+            internalHours: 0,
+            projectHours: 0,
+          };
+        }
+        const value = entriesGrouped[key];
+        value.internalDays.forEach((internalDay) => {
+          if (isWithinWeek(date(internalDay.date))) {
+            week[key].internalHours += Number(internalDay.hours);
+          }
+        });
+
+        value.projectDays.forEach((day) => {
+          if (isWithinWeek(date(day.date))) {
+            week[key].projectHours += Number(day.hours);
+          }
+        });
+      });
+    });
+
+    const normalizedData = [...this.reportColumns];
+    let internalSum = 0;
+    let projectSum = 0;
+    Object.keys(intervalsGrouped).forEach((key) => {
+      const value = intervalsGrouped[key];
+      Object.keys(value).forEach((projectKey) => {
+        const projectValue = value[projectKey];
+        if (projectValue.internalHours || projectValue.projectHours) {
+          const _endOfWeek = endOfWeek(date(key), { weekStartsOn: 1 });
+          internalSum += projectValue.internalHours;
+          projectSum += projectValue.projectHours;
+          normalizedData.push([
+            key,
+            format(
+              isSameMonth(date(key), _endOfWeek)
+                ? _endOfWeek
+                : lastDayOfMonth(date(key)),
+              this.dateFormat
+            ),
+            projectKey.split('..')[0],
+            projectKey.split('..')[1],
+            projectValue.projectHours.toString(),
+            projectValue.internalHours.toString(),
+          ]);
+        }
+      });
+    });
+    if (entries && entries.length) {
+      normalizedData.push([]);
+      normalizedData.push([]);
+      normalizedData.push([
+        '',
+        '',
+        '',
+        '',
+        projectSum.toString(),
+        internalSum.toString(),
+      ]);
     }
 
-    saveXlsxFile(data: string[][], fileName: string): void {
-      const sheetName = "Sheet 1";
-    
-      const sheet = xlsx.utils.aoa_to_sheet(data);
-      const wb = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(wb, sheet, sheetName);
-      xlsx.writeFile(wb, fileName);
-    }
+    return normalizedData;
+  }
+
+  saveXlsxFile(data: string[][], fileName: string): void {
+    const sheetName = 'Sheet 1';
+
+    const sheet = xlsx.utils.aoa_to_sheet(data);
+    const wb = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, sheet, sheetName);
+    xlsx.writeFile(wb, fileName);
+  }
+
+  protected getParsedData() {}
 }
