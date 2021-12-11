@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { InExcelExportService } from '../in-excel-export.service';
 
 import { InExcelToolbarComponent } from './in-excel-toolbar.component';
 
@@ -8,9 +9,9 @@ describe('InExcelToolbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InExcelToolbarComponent ]
-    })
-    .compileComponents();
+      declarations: [InExcelToolbarComponent],
+      providers: [InExcelExportService],
+    }).compileComponents();
   });
 
   beforeEach(() => {

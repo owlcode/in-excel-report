@@ -1,45 +1,48 @@
 <mat-toolbar>
-    <img src="https://in-team.com.pl/static/logo.svg" style="max-height: 100%" />
-    <span class="u-ml-medium">Monthly Excel Report</span>
-    
-    <span class="spacer"></span>
-    <form [formGroup]="formGroup">
-        <mat-form-field>
-            <mat-label>Reporter Name</mat-label>
-            <input formControlName="user" placeholder="jkowalski" matInput />
-        </mat-form-field>
-    </form>
-    <button
-        class="u-ml-medium"
-        [matMenuTriggerFor]="selectMonthMenu"
-        mat-raised-button
-        matTooltip="Select reporting month"
-        (click)="onSelectMonth($event)"
-        aria-label="Select reporting month"
-    >
-        <span style="text-transform: capitalize">{{ month }}</span>
-        <mat-icon class="u-ml-small">event</mat-icon>
-    </button>
+  <img src="https://in-team.com.pl/static/logo.svg" style="max-height: 100%" />
+  <span class="u-ml-medium">Monthly Excel Report</span>
 
-    <mat-menu #selectMonthMenu>
-        <mat-calendar
-            *ngIf="isMenuOpened | async"
-            startView="year"
-            (click)="$event.stopPropagation()"
-            [headerComponent]="emptyHeaderComponent"
-            (monthSelected)="monthSelected($event)"
-        ></mat-calendar>
-    </mat-menu>
-    
-    <button
-        class="u-ml-medium"
-        mat-raised-button
-        color="primary"
-        matTooltip="Save report to xlsx file"
-        (click)="onExport($event)"
-        aria-label="Export prepared report to excel"
-    >
-        Export to xlsx
-        <mat-icon class="u-ml-small">file_download</mat-icon>
-    </button>
+  <span class="spacer"></span>
+  <form [formGroup]="formGroup">
+    <mat-form-field>
+      <mat-label>Reporter Name</mat-label>
+      <input formControlName="user" placeholder="jkowalski" matInput />
+      <span matPrefix>
+        <mat-icon class="u-ml-small">person</mat-icon>
+      </span>
+    </mat-form-field>
+  </form>
+  <button
+    class="u-ml-medium"
+    [matMenuTriggerFor]="selectMonthMenu"
+    mat-raised-button
+    matTooltip="Select reporting month"
+    (click)="onSelectMonth()"
+    aria-label="Select reporting month"
+  >
+    <span style="text-transform: capitalize">{{ month }}</span>
+    <mat-icon class="u-ml-small">event</mat-icon>
+  </button>
+
+  <mat-menu #selectMonthMenu>
+    <mat-calendar
+      *ngIf="isMenuOpened | async"
+      startView="year"
+      (click)="$event.stopPropagation()"
+      [headerComponent]="emptyHeaderComponent"
+      (monthSelected)="monthSelected($event)"
+    ></mat-calendar>
+  </mat-menu>
+
+  <button
+    class="u-ml-medium"
+    mat-raised-button
+    color="primary"
+    matTooltip="Save report to xlsx file"
+    (click)="onExport($event)"
+    aria-label="Export prepared report to excel"
+  >
+    Export to xlsx
+    <mat-icon class="u-ml-small">file_download</mat-icon>
+  </button>
 </mat-toolbar>

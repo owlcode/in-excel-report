@@ -1,9 +1,7 @@
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
-import {
-  format, toDate
-} from 'date-fns';
+import { format, toDate } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import ls from 'localstorage-slim';
 import { BehaviorSubject } from 'rxjs';
@@ -25,21 +23,19 @@ export interface InExcelToolbarState {
 @Component({
   selector: 'in-excel-toolbar',
   templateUrl: './in-excel-toolbar.component.html',
-  styleUrls: ['./in-excel-toolbar.component.scss']
+  styleUrls: ['./in-excel-toolbar.component.scss'],
 })
 export class InExcelToolbarComponent {
   // Used to pick default reporting month. First 3 days of month pick previous month
-  readonly now = Date.now() - 3 * 24 * 60 * 60 * 1000; 
+  readonly now = Date.now() - 3 * 24 * 60 * 60 * 1000;
   readonly selectedMonthFormat = 'LLLL yyyy';
   emptyHeaderComponent = InEmptyCalendarHeader;
   formGroup = this.inExcelExportService.formGroup;
-  name = new FormControl(ls.get('client') || '', [Validators.required])
+  name = new FormControl(ls.get('client') || '', [Validators.required]);
   isMenuOpened = new BehaviorSubject<boolean>(false);
   month = format(this.now, this.selectedMonthFormat, {
-    locale: pl
+    locale: pl,
   });
-  @Output()
-  add = new EventEmitter<Event>();
 
   @Output()
   export = new EventEmitter<Event>();
@@ -52,20 +48,14 @@ export class InExcelToolbarComponent {
 
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
-  constructor(
-    protected inExcelExportService: InExcelExportService
-  ) { }
+  constructor(protected inExcelExportService: InExcelExportService) {}
 
   ngOnInit() {
     this.selectedMonthChange.next(toDate(this.now));
   }
 
-  onSelectMonth(date: any) {
+  onSelectMonth() {
     this.isMenuOpened.next(true);
-  }
-
-  onAdd(ev: Event): void {
-    this.add.emit(ev);
   }
 
   onExport(ev: Event): void {
@@ -74,11 +64,10 @@ export class InExcelToolbarComponent {
 
   monthSelected(date: Date) {
     this.month = format(date, this.selectedMonthFormat, {
-      locale: pl
-    })
+      locale: pl,
+    });
     this.selectedMonthChange.next(date);
     this.isMenuOpened.next(false);
     this.menuTrigger.closeMenu();
   }
-
 }

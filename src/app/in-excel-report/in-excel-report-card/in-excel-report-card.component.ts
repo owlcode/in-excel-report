@@ -1,127 +1,148 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatCalendar } from '@angular/material/datepicker';
-import { addDays, eachDayOfInterval, format, isWeekend, lastDayOfMonth, startOfMonth, subDays, toDate } from 'date-fns';
+import {
+  addDays,
+  eachDayOfInterval,
+  format,
+  isWeekend,
+  lastDayOfMonth,
+  startOfMonth,
+  subDays,
+  toDate,
+} from 'date-fns';
 import ls from 'localstorage-slim';
 import { Subscription, tap } from 'rxjs';
 import { InExcelExportService } from '../in-excel-export.service';
 
 @Component({
-    selector: 'in-empty-calendar-header',
-    template: '',
-    styles: [':host { margin-top: 10px; display: block; }'],
+  selector: 'in-empty-calendar-header',
+  template: '',
+  styles: [':host { margin-top: 10px; display: block; }'],
 })
 export class InEmptyCalendarHeader {}
 
 export interface InExcelReportCardModel {
-    client: string;
-    project: string;
-    isInternal: boolean;
-    hours: string;
-    selectedDays?: string[];
+  client: string;
+  project: string;
+  isInternal: boolean;
+  hours: string;
+  selectedDays?: string[];
 }
 @Component({
-    selector: 'in-excel-report-card',
-    templateUrl: './in-excel-report-card.component.html',
-    styleUrls: ['./in-excel-report-card.component.scss'],
+  selector: 'in-excel-report-card',
+  templateUrl: './in-excel-report-card.component.html',
+  styleUrls: ['./in-excel-report-card.component.scss'],
 })
 export class InExcelReportCardComponent implements OnChanges, AfterViewInit {
-    readonly dateFormat = this.inExcelExportService.dateFormat;
-    readonly emptyCalendarHeader = InEmptyCalendarHeader;
+  readonly dateFormat = this.inExcelExportService.dateFormat;
+  readonly emptyCalendarHeader = InEmptyCalendarHeader;
+  readonly hours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  formGroup = new FormGroup({
+    client: new FormControl(ls.get('client') || ''),
+    project: new FormControl(ls.get('project') || ''),
+    hours: new FormControl(ls.get('hours') || 8),
+    isInternal: new FormControl(ls.get('isInternal') || false),
+  });
 
-    formGroup = new FormGroup({
-        client: new FormControl(ls.get('client') || ''),
-        project: new FormControl(ls.get('project') || ''),
-        hours: new FormControl(ls.get('hours') || ''),
-        isInternal: new FormControl(ls.get('isInternal') || false),
-    });
+  updateLs$ = this.formGroup.valueChanges.pipe(
+    tap((reportConfig) => {
+      Object.entries(reportConfig).forEach(([key, value]) => {
+        ls.set(key, value);
+      });
+    })
+  );
 
-    updateLs$ = this.formGroup.valueChanges.pipe(
-        tap(reportConfig => {
-            Object.entries(reportConfig).forEach(([key, value]) => {
-                ls.set(key, value);
-            });
-        })
-    );
+  subscription = new Subscription();
 
-    subscription = new Subscription();
+  daysSelected: Set<string> = new Set();
 
-    daysSelected: Set<string> = new Set();
+  @ViewChild('calendar') calendar!: MatCalendar<Date>;
 
-    @ViewChild('calendar') calendar!: MatCalendar<Date>;
+  @Input() month?: Date | number;
 
-    @Input() month?: Date | number;
+  @Output() valueChange = new EventEmitter<Set<string>>();
 
-    @Output() valueChange = new EventEmitter<Set<string>>();
+  @Output() remove = new EventEmitter<void>();
 
-    @Output() remove = new EventEmitter<void>();
+  constructor(protected inExcelExportService: InExcelExportService) {
+    this.subscription.add(this.updateLs$.subscribe());
+  }
 
-    constructor(protected inExcelExportService: InExcelExportService) {
-        this.subscription.add(this.updateLs$.subscribe());
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  isSelected = (event: any, time: any): string => {
+    const beforeDate = format(subDays(event, 1), this.dateFormat);
+    const date = format(event, this.dateFormat);
+    const afterDate = format(addDays(event, 1), this.dateFormat);
+    if (this.daysSelected.has(date)) {
+      if (
+        this.daysSelected.has(beforeDate) &&
+        this.daysSelected.has(afterDate)
+      ) {
+        return 'middle-selected';
+      }
+
+      if (this.daysSelected.has(beforeDate)) {
+        return 'last-selected';
+      }
+
+      if (this.daysSelected.has(afterDate)) {
+        return 'first-selected';
+      }
+
+      return 'selected';
     }
 
-    ngOnDestroy() {
-        this.subscription.unsubscribe();
-    }
+    return '';
+  };
 
-    isSelected = (event: any, time: any): string => {
-        const beforeDate = format(subDays(event, 1), this.dateFormat);
-        const date = format(event, this.dateFormat);
-        const afterDate = format(addDays(event, 1), this.dateFormat);
-        if (this.daysSelected.has(date)) {
-            if (this.daysSelected.has(beforeDate) && this.daysSelected.has(afterDate)) {
-                return 'middle-selected';
-            }
-
-            if (this.daysSelected.has(beforeDate)) {
-                return 'last-selected';
-            }
-
-            if (this.daysSelected.has(afterDate)) {
-                return 'first-selected';
-            }
-
-            return 'selected';
-        }
-
-        return '';
-    };
-
-    ngOnChanges({ month }: SimpleChanges): void {
-        if (month) {
-            this.daysSelected = new Set(this.getWorkingDayList(month.currentValue));
-            this.valueChange.emit(this.daysSelected);
-            if (this.calendar) {
-                this.calendar.activeDate = toDate(month.currentValue);
-                this.calendar.updateTodaysDate();
-            }
-        }
-    }
-
-    ngAfterViewInit() {
-        if (!this.month) {
-            return;
-        }
-        this.calendar.activeDate = toDate(this.month);
+  ngOnChanges({ month }: SimpleChanges): void {
+    if (month) {
+      this.daysSelected = new Set(this.getWorkingDayList(month.currentValue));
+      this.valueChange.emit(this.daysSelected);
+      if (this.calendar) {
+        this.calendar.activeDate = toDate(month.currentValue);
         this.calendar.updateTodaysDate();
+      }
     }
+  }
 
-    getWorkingDayList(month: Date | number): string[] {
-        const start = startOfMonth(month);
-        const end = lastDayOfMonth(month);
-        return eachDayOfInterval({ start, end })
-            .filter(date => !isWeekend(date))
-            .map(date => format(date, this.dateFormat));
+  ngAfterViewInit() {
+    if (!this.month) {
+      return;
     }
+    this.calendar.activeDate = toDate(this.month);
+    this.calendar.updateTodaysDate();
+  }
 
-    select(event: Date) {
-        const date = format(event, this.dateFormat);
-        if (this.daysSelected.has(date)) {
-            this.daysSelected.delete(date);
-        } else {
-            this.daysSelected.add(date);
-        }
-        this.calendar.updateTodaysDate();
-        this.valueChange.emit(this.daysSelected);
+  getWorkingDayList(month: Date | number): string[] {
+    const start = startOfMonth(month);
+    const end = lastDayOfMonth(month);
+    return eachDayOfInterval({ start, end })
+      .filter((date) => !isWeekend(date))
+      .map((date) => format(date, this.dateFormat));
+  }
+
+  select(event: Date) {
+    const date = format(event, this.dateFormat);
+    if (this.daysSelected.has(date)) {
+      this.daysSelected.delete(date);
+    } else {
+      this.daysSelected.add(date);
     }
+    this.calendar.updateTodaysDate();
+    this.valueChange.emit(this.daysSelected);
+  }
 }
