@@ -1,3 +1,12 @@
+# [1.3.0](https://github.com/owlcode/in-excel-report/compare/v1.2.0...v1.3.0) (2022-04-03)
+
+
+### Features
+
+* add GH link, bump deps ([#14](https://github.com/owlcode/in-excel-report/issues/14)) ([24f64c6](https://github.com/owlcode/in-excel-report/commit/24f64c66650e52c55e0602bd2a50f7a305f91720))
+
+
+
 # [1.2.0](https://github.com/owlcode/in-excel-report/compare/v1.1.0...v1.2.0) (2021-12-11)
 
 
