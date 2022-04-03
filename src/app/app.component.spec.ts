@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+(window as any).gtag = () => undefined;
 
 describe('AppComponent', () => {
   beforeEach(async () => {
