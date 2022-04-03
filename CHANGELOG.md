@@ -1,3 +1,12 @@
+# [1.4.0](https://github.com/owlcode/in-excel-report/compare/v1.3.0...v1.4.0) (2022-04-03)
+
+
+### Features
+
+* set proper GA track id ([34dc01b](https://github.com/owlcode/in-excel-report/commit/34dc01b1362609f4230cc7c1dd9ba80c1733803b))
+
+
+
 # [1.3.0](https://github.com/owlcode/in-excel-report/compare/v1.2.0...v1.3.0) (2022-04-03)
 
 
