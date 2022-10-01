@@ -1,3 +1,13 @@
+## [1.4.1](https://github.com/owlcode/in-excel-report/compare/v1.4.0...v1.4.1) (2022-10-01)
+
+
+### Bug Fixes
+
+* upgrade rxjs from 7.4.0 to 7.5.6 ([#25](https://github.com/owlcode/in-excel-report/issues/25)) ([fc7a168](https://github.com/owlcode/in-excel-report/commit/fc7a1685ee0bd3a23266292b73f105922f1f9976))
+* upgrade xlsx from 0.17.3 to 0.18.5 ([#24](https://github.com/owlcode/in-excel-report/issues/24)) ([12dae91](https://github.com/owlcode/in-excel-report/commit/12dae9154aeeb3213e17bd9a6a9b17daebdecc0d))
+
+
+
 # [1.4.0](https://github.com/owlcode/in-excel-report/compare/v1.3.0...v1.4.0) (2022-04-03)
 
 
